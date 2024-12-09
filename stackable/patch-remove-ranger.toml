@@ -1,3 +1,3 @@
 # Patch metadata for remove-ranger
 version = "26.0.0"
-description = "Initial patch for remove-ranger"
+description = "This removes the Ranger extension"
