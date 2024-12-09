@@ -34,7 +34,7 @@ jobs:
 
       - name: Create new branch
         run: |
-          NEW_BRANCH="patch/${{ github.event.inputs.version }}/${{ github.event.inputs.name }}"
+          NEW_BRANCH="stackable/patch/${{ github.event.inputs.version }}/${{ github.event.inputs.name }}"
           git checkout -b "$NEW_BRANCH"
 
       - name: Create patch metadata file
