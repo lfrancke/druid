@@ -54,5 +54,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          NEW_BRANCH="patch/${{ github.event.inputs.version }}/${{ github.event.inputs.name }}"
+          NEW_BRANCH="stackable/patch/${{ github.event.inputs.version }}/${{ github.event.inputs.name }}"
           git push origin "$NEW_BRANCH"
