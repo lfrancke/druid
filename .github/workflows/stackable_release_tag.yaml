@@ -1,0 +1,35 @@
+name: Create Release Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      product-version:
+        description: 'Which version of the product is this tag about? (e.g., 26.0.0)'
+        required: true
+      sdp-version:
+        description: 'Which SDP version is this for (e.g., 25.3)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  create-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Create and push tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="stackable/release/${{ github.event.inputs.sdp-version }}/${{ github.event.inputs.product-version }}"
+          BRANCH_NAME="stackable/development/${{ github.event.inputs.sdp-version }}/${{ github.event.inputs.product-version }}"
+
+          git checkout "$BRANCH_NAME"
+          git tag "$TAG_NAME"
+          git push origin "$TAG_NAME"
