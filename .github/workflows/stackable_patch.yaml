@@ -1,0 +1,58 @@
+name: Bootstrap Patch Branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Base branch to create new patch branch from (e.g., release/26.0.0)'
+        required: true
+      version:
+        description: 'Version identifier for the patch branch (e.g., 26.0.0)'
+        required: true
+      name:
+        description: 'Name of the patch (e.g., ranger)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  create-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          ssh-key: ${{ secrets.PUSH_KEY }}
+
+      - name: Set up Git user
+        run: |
+          git config --global user.email "github-actions@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Create new branch
+        run: |
+          NEW_BRANCH="patch/${{ github.event.inputs.version }}/${{ github.event.inputs.name }}"
+          git checkout -b "$NEW_BRANCH"
+
+      - name: Create patch metadata file
+        run: |
+          PATCH_FILE="stackable/patch-${{ github.event.inputs.name }}.toml"
+          mkdir -p stackable
+          echo "# Patch metadata for ${{ github.event.inputs.name }}" > "$PATCH_FILE"
+          echo "version = \"${{ github.event.inputs.version }}\"" >> "$PATCH_FILE"
+          echo "description = \"Initial patch for ${{ github.event.inputs.name }}\"" >> "$PATCH_FILE"
+          git add "$PATCH_FILE"
+
+      - name: Commit new patch file
+        run: |
+          git commit -m "Add patch metadata for ${{ github.event.inputs.name }}"
+
+      - name: Push new branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NEW_BRANCH="patch/${{ github.event.inputs.version }}/${{ github.event.inputs.name }}"
+          git push origin "$NEW_BRANCH"
